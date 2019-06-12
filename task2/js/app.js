@@ -1,6 +1,11 @@
+const MODE = {
+  LINE: 'line',
+  ERASE: 'erase',
+  SELECT: 'select'
+}
 const app = {
   initDone: false,
-  isEraseMode: false,
+  mode: MODE.LINE,
   lines: [],
   pos: null,
   
@@ -14,21 +19,36 @@ const app = {
   },
   
   bindToolbarEvents: function() {
-    document.getElementById('btn-erase').addEventListener('click', () => {
-      this.isEraseMode = true;
+    document.getElementById('btn-select').addEventListener('click', () => {
+      this.mode = MODE.SELECT;
       this.pos = null;
       this.updateToolbarState();
     });
+    document.getElementById('btn-erase').addEventListener('click', () => {
+      if (this.lines.length > 0) {
+        let selectedIndex = -1;
+        this.lines.forEach((line, index) => {
+          if(line.isSelected()) {
+            selectedIndex = index;
+          }
+        });
+        if(selectedIndex >= 0) {
+          this.lines.splice(selectedIndex, 1);
+          this.render();
+        }
+      }
+    });
     document.getElementById('btn-line').addEventListener('click', () => {
-      this.isEraseMode = false;
+      this.mode = MODE.LINE;
       this.pos = null;
       this.updateToolbarState();
     });
   },
   
   updateToolbarState: function() {
-    document.getElementById('btn-erase').className = this.isEraseMode ? 'active' : '';
-    document.getElementById('btn-line').className = this.isEraseMode ? '' : 'active';
+    document.getElementById('btn-select').className = this.mode === MODE.SELECT ? 'active' : '';
+    document.getElementById('btn-erase').className = this.mode === MODE.ERASE ? 'active' : '';
+    document.getElementById('btn-line').className = this.mode === MODE.LINE ? 'active' : '';
   },
   
   bindDrawAreaEvents: function() {
@@ -36,20 +56,25 @@ const app = {
     canvas.addEventListener('click', (e) => {
       const x = e.offsetX;
       const y = e.offsetY;
-      if(this.isEraseMode) {
+      if(this.mode === MODE.SELECT) {
         if (this.lines.length > 0) {
-          let minSquareDistance;
-          let closestIndex;
+          let minSquareDistance = 100;
+          let closestIndex = -1;
           this.lines.forEach((line, index) => {
             const squareDistance = line.squareDistanceFrom(x, y);
-            if(index === 0 || squareDistance < minSquareDistance) {
+            if(squareDistance <= minSquareDistance) {
               minSquareDistance = squareDistance;
               closestIndex = index;
             }
+            if(line.isSelected()) {
+              line.unselect();
+            }
           });
-          this.lines.splice(closestIndex, 1);
+          if(closestIndex >= 0) {
+            this.lines[closestIndex].select();
+          }
         }
-      } else {
+      } else if(this.mode === MODE.LINE) {
         if(!this.pos) {
           // save first click of the line
           this.pos = [ x, y ];
@@ -61,6 +86,8 @@ const app = {
           this.lines.push(line);
           this.pos = null;
         }
+      } else {
+        console.error("ERROR: Unknow mode", this.mode);
       }
       this.render();
     });
