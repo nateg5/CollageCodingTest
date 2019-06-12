@@ -27,6 +27,27 @@
 function sizeImage(canvasWidth, canvasHeight, imageAspect) {
   // TODO: fill in here
 
+  /** jsfidd at https://jsfiddle.net/c63fxp71/4/ **/
+
+  let xpos = 0;
+  let ypos = 0;
+  let sizex = imageAspect;
+  let sizey = 1;
+  
+  let canvasAspect = canvasWidth / canvasHeight;
+  
+  if(canvasAspect < imageAspect) {
+  	let multiplier = canvasWidth / sizex;
+    sizex *= multiplier;
+    sizey *= multiplier;
+    ypos = (canvasHeight - sizey) / 2;
+  } else {
+    let multiplier = canvasHeight / sizey;
+    sizex *= multiplier;
+    sizey *= multiplier;
+    xpos = (canvasWidth - sizex) / 2;
+  }
+
   // final image position and size
   return [xpos, ypos, sizex, sizey];
 }
