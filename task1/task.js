@@ -27,7 +27,7 @@
 function sizeImage(canvasWidth, canvasHeight, imageAspect) {
   // TODO: fill in here
 
-  /** jsfidd at https://jsfiddle.net/c63fxp71/4/ **/
+  /** jsfidd at https://jsfiddle.net/c63fxp71/5/ **/
 
   let xpos = 0;
   let ypos = 0;
@@ -36,7 +36,7 @@ function sizeImage(canvasWidth, canvasHeight, imageAspect) {
   
   let canvasAspect = canvasWidth / canvasHeight;
   
-  if(canvasAspect < imageAspect) {
+  if(canvasAspect > imageAspect) {
   	let multiplier = canvasWidth / sizex;
     sizex *= multiplier;
     sizey *= multiplier;
