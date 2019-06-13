@@ -2,7 +2,8 @@ const MODE = {
   LINE: 'line',
   ERASE: 'erase',
   SELECT: 'select',
-  PENCIL: 'pencil'
+  PENCIL: 'pencil',
+  MOVE: 'move'
 }
 const app = {
   initDone: false,
@@ -21,6 +22,11 @@ const app = {
   },
   
   bindToolbarEvents: function() {
+    document.getElementById('btn-move').addEventListener('click', () => {
+      this.mode = MODE.MOVE;
+      this.pos = null;
+      this.updateToolbarState();
+    });
     document.getElementById('btn-pencil').addEventListener('click', () => {
       this.mode = MODE.PENCIL;
       this.pos = null;
@@ -42,6 +48,7 @@ const app = {
   },
   
   updateToolbarState: function() {
+    document.getElementById('btn-move').className = this.mode === MODE.MOVE ? 'active' : '';
     document.getElementById('btn-pencil').className = this.mode === MODE.PENCIL ? 'active' : '';
     document.getElementById('btn-select').className = this.mode === MODE.SELECT ? 'active' : '';
     document.getElementById('btn-erase').className = this.mode === MODE.ERASE ? 'active' : '';
@@ -69,6 +76,8 @@ const app = {
       const y = e.offsetY;
       if(this.mode === MODE.PENCIL) {
         this.pencilBegin(x, y);
+      } else if(this.mode === MODE.MOVE) {
+        this.moveBegin(x, y);
       }
       this.render();
     });
@@ -77,36 +86,38 @@ const app = {
       const y = e.offsetY;
       if(this.mode === MODE.PENCIL) {
         this.pencilMove(x, y);
+      } else if(this.mode === MODE.MOVE) {
+        this.moveMove(x, y, canvas.width, canvas.height);
       }
       this.render();
     });
     canvas.addEventListener('mouseup', (e) => {
-      const x = e.offsetX;
-      const y = e.offsetY;
       if(this.mode === MODE.PENCIL) {
         this.pencilEnd();
       }
       this.render();
     });
     canvas.addEventListener('mouseout', (e) => {
-      const x = e.offsetX;
-      const y = e.offsetY;
       if(this.mode === MODE.PENCIL) {
         this.pencilEnd();
+      }
+      this.render();
+    });
+    document.addEventListener('mouseup', (e) => {
+      if(this.mode === MODE.MOVE) {
+        this.moveEnd();
       }
       this.render();
     });
   },
 
   erase: function() {
-    if (this.lines.length > 0) {
-      this.lines.forEach((line, index) => {
-        if(line.isSelected()) {
-          this.lines.splice(index, 1);
-          this.render();
-        }
-      });
-    }
+    this.lines.forEach((line, index) => {
+      if(line.isSelected()) {
+        this.lines.splice(index, 1);
+        this.render();
+      }
+    });
   },
 
   select: function (x, y) {
@@ -169,6 +180,33 @@ const app = {
       this.lines.splice(-1, 1);
     }
     this.pencil = null;
+    this.pos = null;
+  },
+
+  moveBegin: function(x, y) {
+    this.select(x, y);
+    // save move start position
+    this.pos = [ x, y ];
+  },
+
+  moveMove: function(x, y, maxX, maxY) {
+    if(this.pos && (this.pos[0] !== x || this.pos[1] !== y)) {
+      const x0 = this.pos[0], y0 = this.pos[1];
+      this.lines.forEach((line, index) => {
+        if(line.isSelected()) {
+          line.move(x - x0, y - y0, maxX, maxY);
+        }
+      });
+      this.pos = [ x, y ];
+    }
+  },
+
+  moveEnd: function() {
+    this.lines.forEach((line, index) => {
+      if(line.isSelected()) {
+        line.unselect();
+      }
+    });
     this.pos = null;
   },
   

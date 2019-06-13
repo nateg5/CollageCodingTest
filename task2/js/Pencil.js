@@ -32,11 +32,27 @@ Pencil.prototype.drawEnds = function(ctx) {
   drawEnd(this.lines[this.lines.length-1].x2, this.lines[this.lines.length-1].y2);
 };
 
-Pencil.prototype.move = function(dx, dy) {
-  this.x1 += dx;
-  this.y1 += dy;
-  this.x2 += dx;
-  this.y2 += dy;
+Pencil.prototype.move = function(dx, dy, maxX, maxY) {
+  let canMoveX = true;
+  let canMoveY = true;
+  this.lines.forEach((line, index) => {
+    if(!line.canMoveX(dx, maxX)) {
+        canMoveX = false;
+    }
+    if(!line.canMoveY(dy, maxY)) {
+        canMoveY = false;
+    }
+  });
+  if(canMoveX) {
+    this.lines.forEach((line, index) => {
+        line.moveX(dx, maxX);
+    });
+  }
+  if(canMoveY) {
+    this.lines.forEach((line, index) => {
+        line.moveY(dy, maxY);
+    });
+  }
 };
 
 Pencil.prototype.squareDistanceFrom = function(x, y) {
