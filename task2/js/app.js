@@ -74,7 +74,6 @@ const app = {
           this.lineEnd(x, y);
         }
       }
-      this.render();
     });
     canvas.addEventListener('mousedown', (e) => {
       const x = e.offsetX;
@@ -84,7 +83,6 @@ const app = {
       } else if(this.mode === MODE.MOVE) {
         this.moveBegin(x, y);
       }
-      this.render();
     });
     canvas.addEventListener('mousemove', (e) => {
       const x = e.offsetX;
@@ -94,25 +92,21 @@ const app = {
       } else if(this.mode === MODE.MOVE) {
         this.moveMove(x, y, canvas.width, canvas.height);
       }
-      this.render();
     });
     canvas.addEventListener('mouseup', (e) => {
       if(this.mode === MODE.PENCIL) {
         this.pencilEnd();
       }
-      this.render();
     });
     canvas.addEventListener('mouseout', (e) => {
       if(this.mode === MODE.PENCIL) {
         this.pencilEnd();
       }
-      this.render();
     });
     document.addEventListener('mouseup', (e) => {
       if(this.mode === MODE.MOVE) {
         this.moveEnd();
       }
-      this.render();
     });
   },
 
@@ -142,6 +136,7 @@ const app = {
       if(closestIndex >= 0) {
         this.lines[closestIndex].select();
       }
+      this.render();
     }
   },
 
@@ -158,6 +153,7 @@ const app = {
       const line = new Line(x0, y0, x, y, length);
       this.lines.push(line);
       this.pos = null;
+      this.render();
     }
   },
 
@@ -177,12 +173,14 @@ const app = {
       const line = new Line(x0, y0, x, y, length);
       this.pencil.addLine(line);
       this.pos = [ x, y ];
+      this.render();
     }
   },
 
   pencilEnd: function() {
     if(this.pencil && this.pencil.isEmpty()) {
       this.lines.splice(-1, 1);
+      this.render();
     }
     this.pencil = null;
     this.pos = null;
@@ -192,6 +190,7 @@ const app = {
     this.select(x, y);
     // save move start position
     this.pos = [ x, y ];
+    this.render();
   },
 
   moveMove: function(x, y, maxX, maxY) {
@@ -200,6 +199,7 @@ const app = {
       this.lines.forEach((line, index) => {
         if(line.isSelected()) {
           line.move(x - x0, y - y0, maxX, maxY);
+          this.render();
         }
       });
       this.pos = [ x, y ];
@@ -210,6 +210,7 @@ const app = {
     this.lines.forEach((line, index) => {
       if(line.isSelected()) {
         line.unselect();
+        this.render();
       }
     });
     this.pos = null;
