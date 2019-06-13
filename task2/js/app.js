@@ -102,6 +102,10 @@ const app = {
         this.pencilEnd();
       }
     });
+    /**
+     * only end move action when user releases the mouse 
+     * if the user drags outside of the canvas and then back on to the canvas the move action will still be active
+     */
     document.addEventListener('mouseup', (e) => {
       if(this.mode === MODE.MOVE) {
         this.moveEnd();
@@ -165,7 +169,7 @@ const app = {
 
   pencilMove: function(x, y) {
     if(this.pos && (this.pos[0] !== x || this.pos[1] !== y)) {
-      // create the line and add to the list
+      // create the line and add to the pencil
       const x0 = this.pos[0], y0 = this.pos[1];
       const line = new Line(x0, y0, x, y);
       this.pencil.addLine(line);
@@ -175,6 +179,10 @@ const app = {
   },
 
   pencilEnd: function() {
+    /**
+     * if pencil is empty then remove from list
+     * this can happen if the mousedown and mouseup event happen at the same coordinates
+     */
     if(this.pencil && this.pencil.isEmpty()) {
       this.lines.splice(-1, 1);
       this.render();
@@ -184,6 +192,7 @@ const app = {
   },
 
   moveBegin: function(x, y) {
+    // select the object being moved
     this.select(x, y);
     // save move start position
     this.pos = [ x, y ];

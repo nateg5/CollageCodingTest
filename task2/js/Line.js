@@ -31,6 +31,10 @@ Line.prototype.drawEnds = function(ctx) {
 };
 
 Line.prototype.move = function(dx, dy, maxX, maxY) {
+  /**
+   * move x and y independently
+   * this is necessary when the object starts to hit the edge of the canvas
+   */
   this.moveX(dx, maxX);
   this.moveY(dy, maxY);
 };

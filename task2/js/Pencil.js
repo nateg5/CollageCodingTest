@@ -43,11 +43,19 @@ Pencil.prototype.move = function(dx, dy, maxX, maxY) {
         canMoveY = false;
     }
   });
+  /**
+   * only move along the x axis if all of the lines in this pencil
+   * can be moved without moving outside of the canvas
+   */
   if(canMoveX) {
     this.lines.forEach((line, index) => {
         line.moveX(dx, maxX);
     });
   }
+  /**
+   * only move along the y axis if all of the lines in this pencil
+   * can be moved without moving outside of the canvas
+   */
   if(canMoveY) {
     this.lines.forEach((line, index) => {
         line.moveY(dy, maxY);
@@ -55,6 +63,9 @@ Pencil.prototype.move = function(dx, dy, maxX, maxY) {
   }
 };
 
+/**
+ * find the distance of the closest line segment within this pencil to the coordinates
+ */
 Pencil.prototype.squareDistanceFrom = function(x, y) {
   let minSquareDistance;
   this.lines.forEach((line, index) => {
