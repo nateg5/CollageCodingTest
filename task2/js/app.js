@@ -22,17 +22,21 @@ const app = {
   },
   
   bindToolbarEvents: function() {
+    const canvas = document.getElementById('canvas');
     document.getElementById('btn-move').addEventListener('click', () => {
+      canvas.style.cursor = "move";
       this.mode = MODE.MOVE;
       this.pos = null;
       this.updateToolbarState();
     });
     document.getElementById('btn-pencil').addEventListener('click', () => {
+      canvas.style.cursor = "crosshair";
       this.mode = MODE.PENCIL;
       this.pos = null;
       this.updateToolbarState();
     });
     document.getElementById('btn-select').addEventListener('click', () => {
+      canvas.style.cursor = "default";
       this.mode = MODE.SELECT;
       this.pos = null;
       this.updateToolbarState();
@@ -41,6 +45,7 @@ const app = {
       this.erase();
     });
     document.getElementById('btn-line').addEventListener('click', () => {
+      canvas.style.cursor = "crosshair";
       this.mode = MODE.LINE;
       this.pos = null;
       this.updateToolbarState();

@@ -40,3 +40,6 @@ body {
 .toolbar button img {
   height: 20px;
 }
+#canvas {
+  cursor: crosshair;
+}
