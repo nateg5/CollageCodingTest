@@ -58,8 +58,7 @@ Pencil.prototype.move = function(dx, dy, maxX, maxY) {
 Pencil.prototype.squareDistanceFrom = function(x, y) {
   let minSquareDistance;
   this.lines.forEach((line, index) => {
-    const { x1, y1, x2, y2 } = line;
-    let squareDistance = Geometry.squareDistanceToSegment(x, y, x1, y1, x2, y2);
+    let squareDistance = line.squareDistanceFrom(x, y);
     if(index === 0 || squareDistance < minSquareDistance) {
         minSquareDistance = squareDistance;
     }
