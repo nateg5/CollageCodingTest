@@ -1,9 +1,9 @@
 const MODE = {
   LINE: 'line',
-  ERASE: 'erase',
-  SELECT: 'select',
   PENCIL: 'pencil',
-  MOVE: 'move'
+  MOVE: 'move',
+  SELECT: 'select',
+  ERASE: 'erase'
 }
 const app = {
   initDone: false,
@@ -23,15 +23,21 @@ const app = {
   
   bindToolbarEvents: function() {
     const canvas = document.getElementById('canvas');
-    document.getElementById('btn-move').addEventListener('click', () => {
-      canvas.style.cursor = "move";
-      this.mode = MODE.MOVE;
+    document.getElementById('btn-line').addEventListener('click', () => {
+      canvas.style.cursor = "crosshair";
+      this.mode = MODE.LINE;
       this.pos = null;
       this.updateToolbarState();
     });
     document.getElementById('btn-pencil').addEventListener('click', () => {
       canvas.style.cursor = "crosshair";
       this.mode = MODE.PENCIL;
+      this.pos = null;
+      this.updateToolbarState();
+    });
+    document.getElementById('btn-move').addEventListener('click', () => {
+      canvas.style.cursor = "move";
+      this.mode = MODE.MOVE;
       this.pos = null;
       this.updateToolbarState();
     });
@@ -44,20 +50,13 @@ const app = {
     document.getElementById('btn-erase').addEventListener('click', () => {
       this.erase();
     });
-    document.getElementById('btn-line').addEventListener('click', () => {
-      canvas.style.cursor = "crosshair";
-      this.mode = MODE.LINE;
-      this.pos = null;
-      this.updateToolbarState();
-    });
   },
   
   updateToolbarState: function() {
-    document.getElementById('btn-move').className = this.mode === MODE.MOVE ? 'active' : '';
-    document.getElementById('btn-pencil').className = this.mode === MODE.PENCIL ? 'active' : '';
-    document.getElementById('btn-select').className = this.mode === MODE.SELECT ? 'active' : '';
-    document.getElementById('btn-erase').className = this.mode === MODE.ERASE ? 'active' : '';
     document.getElementById('btn-line').className = this.mode === MODE.LINE ? 'active' : '';
+    document.getElementById('btn-pencil').className = this.mode === MODE.PENCIL ? 'active' : '';
+    document.getElementById('btn-move').className = this.mode === MODE.MOVE ? 'active' : '';
+    document.getElementById('btn-select').className = this.mode === MODE.SELECT ? 'active' : '';
   },
   
   bindDrawAreaEvents: function() {
@@ -70,7 +69,7 @@ const app = {
       } else if(this.mode === MODE.LINE) {
         if(!this.pos) {
           this.lineBegin(x, y);
-        } else if(this.pos[0] !== x || this.pos[1] !== y) {
+        } else {
           this.lineEnd(x, y);
         }
       }
@@ -165,7 +164,7 @@ const app = {
   },
 
   pencilMove: function(x, y) {
-    if(this.pencil && (this.pos[0] !== x || this.pos[1] !== y)) {
+    if(this.pos && (this.pos[0] !== x || this.pos[1] !== y)) {
       // create the line and add to the list
       const x0 = this.pos[0], y0 = this.pos[1];
       const line = new Line(x0, y0, x, y);
@@ -188,7 +187,6 @@ const app = {
     this.select(x, y);
     // save move start position
     this.pos = [ x, y ];
-    this.render();
   },
 
   moveMove: function(x, y, maxX, maxY) {
