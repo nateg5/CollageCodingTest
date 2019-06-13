@@ -149,8 +149,7 @@ const app = {
     if(this.pos[0] !== x || this.pos[1] !== y) {
       // create the line and add to the list
       const x0 = this.pos[0], y0 = this.pos[1];
-      const length = Math.sqrt((x - x0) * (x - x0) + (y - y0) * (y - y0));
-      const line = new Line(x0, y0, x, y, length);
+      const line = new Line(x0, y0, x, y);
       this.lines.push(line);
       this.pos = null;
       this.render();
@@ -169,8 +168,7 @@ const app = {
     if(this.pencil && (this.pos[0] !== x || this.pos[1] !== y)) {
       // create the line and add to the list
       const x0 = this.pos[0], y0 = this.pos[1];
-      const length = Math.sqrt((x - x0) * (x - x0) + (y - y0) * (y - y0));
-      const line = new Line(x0, y0, x, y, length);
+      const line = new Line(x0, y0, x, y);
       this.pencil.addLine(line);
       this.pos = [ x, y ];
       this.render();
