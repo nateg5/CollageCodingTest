@@ -196,6 +196,11 @@ const app = {
     this.select(x, y);
     // save move start position
     this.pos = [ x, y ];
+    this.lines.forEach((line, index) => {
+      if(line.isSelected()) {
+        line.setCursor(x, y);
+      }
+    });
   },
 
   moveMove: function(x, y, maxX, maxY) {
@@ -203,7 +208,7 @@ const app = {
       const x0 = this.pos[0], y0 = this.pos[1];
       this.lines.forEach((line, index) => {
         if(line.isSelected()) {
-          line.move(x - x0, y - y0, maxX, maxY);
+          line.move(x, y, maxX, maxY);
           this.render();
         }
       });
@@ -215,6 +220,7 @@ const app = {
     this.lines.forEach((line, index) => {
       if(line.isSelected()) {
         line.unselect();
+        line.resetCursor();
         this.render();
       }
     });

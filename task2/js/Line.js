@@ -4,7 +4,23 @@ const Line = function(x1, y1, x2, y2) {
   this.x2 = x2;
   this.y2 = y2;
   this.selected = false;
+  this.cursor = null;
 };
+
+Line.prototype.setCursor = function(x, y) {
+  this.cursor = {
+    x: x,
+    y: y
+  };
+}
+
+Line.prototype.resetCursor = function() {
+  this.cursor = null;
+}
+
+Line.prototype.getCursor = function() {
+  return this.cursor;
+}
 
 Line.prototype.draw = function(ctx) {
   ctx.strokeStyle = '#000';
@@ -30,42 +46,56 @@ Line.prototype.drawEnds = function(ctx) {
   drawEnd(this.x2, this.y2);
 };
 
-Line.prototype.move = function(dx, dy, maxX, maxY) {
+Line.prototype.move = function(x, y, maxX, maxY) {
   /**
    * move x and y independently
    * this is necessary when the object starts to hit the edge of the canvas
    */
-  this.moveX(dx, maxX);
-  this.moveY(dy, maxY);
+  this.moveX(x - this.cursor.x, maxX);
+  this.moveY(y - this.cursor.y, maxY);
 };
 
 Line.prototype.moveX = function(dx, maxX) {
-  if(this.canMoveX(dx, maxX)) {
-    this.x1 += dx;
-    this.x2 += dx;
-  }
+  dx = this.adjustdx(dx, maxX);
+  this.x1 += dx;
+  this.x2 += dx;
+  this.cursor.x += dx;
 };
 
 Line.prototype.moveY = function(dy, maxY) {
-  if(this.canMoveY(dy, maxY)) {
-    this.y1 += dy;
-    this.y2 += dy;
-  }
+  dy = this.adjustdy(dy, maxY);
+  this.y1 += dy;
+  this.y2 += dy;
+  this.cursor.y += dy;
 };
 
-Line.prototype.canMoveX = function(dx, maxX) {
-  if(this.x1 + dx < 0 || this.x1 + dx > maxX) return false;
-  if(this.x2 + dx < 0 || this.x2 + dx > maxX) return false;
+Line.prototype.adjustdx = function(dx, maxX) {
+  if(this.x1 + dx < 0) {
+    dx = 0 - this.x1;
+  } else if(this.x1 + dx > maxX) {
+    dx = maxX - this.x1;
+  }
+  if(this.x2 + dx < 0) {
+    dx = 0 - this.x2;
+  } else if(this.x2 + dx > maxX) {
+    dx = maxX - this.x2;
+  }
+  return dx;
+};
 
-  return true;
-}
-
-Line.prototype.canMoveY = function(dy, maxY) {
-  if(this.y1 + dy < 0 || this.y1 + dy > maxY) return false;
-  if(this.y2 + dy < 0 || this.y2 + dy > maxY) return false;
-
-  return true;
-}
+Line.prototype.adjustdy = function(dy, maxY) {
+  if(this.y1 + dy < 0) {
+    dy = 0 - this.y1;
+  } else if(this.y1 + dy > maxY) {
+    dy = maxY - this.y1;
+  }
+  if(this.y2 + dy < 0) {
+    dy = 0 - this.y2;
+  } else if(this.y2 + dy > maxY) {
+    dy = maxY - this.y2;
+  }
+  return dy;
+};
 
 Line.prototype.squareDistanceFrom = function(x, y) {
   const { x1, y1, x2, y2 } = this;

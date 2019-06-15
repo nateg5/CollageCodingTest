@@ -3,6 +3,18 @@ const Pencil = function() {
   this.selected = false;
 };
 
+Pencil.prototype.setCursor = function(x, y) {
+  this.lines.forEach((line, index) => {
+    line.setCursor(x, y);
+  });
+}
+
+Pencil.prototype.resetCursor = function() {
+  this.lines.forEach((line, index) => {
+    line.resetCursor();
+  });
+}
+
 Pencil.prototype.addLine = function(line) {
   this.lines.push(line);
 }
@@ -32,35 +44,25 @@ Pencil.prototype.drawEnds = function(ctx) {
   drawEnd(this.lines[this.lines.length-1].x2, this.lines[this.lines.length-1].y2);
 };
 
-Pencil.prototype.move = function(dx, dy, maxX, maxY) {
-  let canMoveX = true;
-  let canMoveY = true;
+Pencil.prototype.move = function(x, y, maxX, maxY) {
+  let masterdx;
+  let masterdy;
   this.lines.forEach((line, index) => {
-    if(!line.canMoveX(dx, maxX)) {
-        canMoveX = false;
+    let dx = x - line.getCursor().x;
+    let dy = y - line.getCursor().y;
+    dx = line.adjustdx(dx, maxX);
+    dy = line.adjustdy(dy, maxY);
+    if(index === 0 || Math.abs(dx) < Math.abs(masterdx)) {
+        masterdx = dx;
     }
-    if(!line.canMoveY(dy, maxY)) {
-        canMoveY = false;
+    if(index === 0 || Math.abs(dy) < Math.abs(masterdy)) {
+        masterdy = dy;
     }
   });
-  /**
-   * only move along the x axis if all of the lines in this pencil
-   * can be moved without moving outside of the canvas
-   */
-  if(canMoveX) {
-    this.lines.forEach((line, index) => {
-        line.moveX(dx, maxX);
-    });
-  }
-  /**
-   * only move along the y axis if all of the lines in this pencil
-   * can be moved without moving outside of the canvas
-   */
-  if(canMoveY) {
-    this.lines.forEach((line, index) => {
-        line.moveY(dy, maxY);
-    });
-  }
+  this.lines.forEach((line, index) => {
+    line.moveX(masterdx, maxX);
+    line.moveY(masterdy, maxY);
+  });
 };
 
 /**
