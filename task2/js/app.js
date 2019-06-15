@@ -11,6 +11,7 @@ const app = {
   lines: [],
   pencil: null,
   pos: null,
+  selectedObjectIndex: -1,
   
   init: function() {
     if(this.initDone) {
@@ -114,15 +115,19 @@ const app = {
   },
 
   erase: function() {
-    this.lines.forEach((line, index) => {
-      if(line.isSelected()) {
-        this.lines.splice(index, 1);
-        this.render();
-      }
-    });
+    if(this.selectedObjectIndex >= 0) {
+      this.lines[this.selectedObjectIndex].unselect();
+      this.lines.splice(this.selectedObjectIndex, 1);
+      this.selectedObjectIndex = -1;
+      this.render();
+    }
   },
 
   select: function (x, y) {
+    if(this.selectedObjectIndex >= 0) {
+      this.lines[this.selectedObjectIndex].unselect();
+      this.selectedObjectIndex = -1;
+    }
     if (this.lines.length > 0) {
       let minSquareDistance = 100;
       let closestIndex = -1;
@@ -132,12 +137,10 @@ const app = {
           minSquareDistance = squareDistance;
           closestIndex = index;
         }
-        if(line.isSelected()) {
-          line.unselect();
-        }
       });
       if(closestIndex >= 0) {
         this.lines[closestIndex].select();
+        this.selectedObjectIndex = closestIndex;
       }
       this.render();
     }
@@ -194,37 +197,29 @@ const app = {
   moveBegin: function(x, y) {
     // select the object being moved
     this.select(x, y);
-    // save move start position
-    this.pos = [ x, y ];
-    this.lines.forEach((line, index) => {
-      if(line.isSelected()) {
-        line.setCursor(x, y);
-      }
-    });
+    if(this.selectedObjectIndex >= 0) {
+      // save move start position
+      this.pos = [ x, y ];
+      this.lines[this.selectedObjectIndex].setCursor(x, y);
+    }
   },
 
   moveMove: function(x, y, maxX, maxY) {
     if(this.pos && (this.pos[0] !== x || this.pos[1] !== y)) {
-      const x0 = this.pos[0], y0 = this.pos[1];
-      this.lines.forEach((line, index) => {
-        if(line.isSelected()) {
-          line.move(x, y, maxX, maxY);
-          this.render();
-        }
-      });
+      this.lines[this.selectedObjectIndex].move(x, y, maxX, maxY);
+      this.render();
       this.pos = [ x, y ];
     }
   },
 
   moveEnd: function() {
-    this.lines.forEach((line, index) => {
-      if(line.isSelected()) {
-        line.unselect();
-        line.resetCursor();
-        this.render();
-      }
-    });
-    this.pos = null;
+    if(this.selectedObjectIndex >= 0) {
+      this.lines[this.selectedObjectIndex].resetCursor();
+      this.lines[this.selectedObjectIndex].unselect();
+      this.selectedObjectIndex = -1;
+      this.render();
+      this.pos = null;
+    }
   },
   
   render: function() {
