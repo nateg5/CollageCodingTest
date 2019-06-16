@@ -12,6 +12,7 @@ const app = {
   pencil: null,
   pos: null,
   selectedObjectIndex: -1,
+  pendingRender: 0,
   
   init: function() {
     if(this.initDone) {
@@ -20,6 +21,10 @@ const app = {
     this.bindToolbarEvents();
     this.bindDrawAreaEvents();
     this.initDone = true;
+
+    setInterval(() => {
+      this.render();
+    }, 20);
   },
   
   bindToolbarEvents: function() {
@@ -119,7 +124,7 @@ const app = {
       this.lines[this.selectedObjectIndex].unselect();
       this.lines.splice(this.selectedObjectIndex, 1);
       this.selectedObjectIndex = -1;
-      this.render();
+      this.pendingRender = 10;
     }
   },
 
@@ -142,7 +147,7 @@ const app = {
         this.lines[closestIndex].select();
         this.selectedObjectIndex = closestIndex;
       }
-      this.render();
+      this.pendingRender = 10;
     }
   },
 
@@ -158,7 +163,7 @@ const app = {
       const line = new Line(x0, y0, x, y);
       this.lines.push(line);
       this.pos = null;
-      this.render();
+      this.pendingRender = 10;
     }
   },
 
@@ -177,7 +182,7 @@ const app = {
       const line = new Line(x0, y0, x, y);
       this.pencil.addLine(line);
       this.pos = [ x, y ];
-      this.render();
+      this.pendingRender = 10;
     }
   },
 
@@ -188,7 +193,7 @@ const app = {
      */
     if(this.pencil && this.pencil.isEmpty()) {
       this.lines.splice(-1, 1);
-      this.render();
+      this.pendingRender = 10;
     }
     this.pencil = null;
     this.pos = null;
@@ -207,7 +212,7 @@ const app = {
   moveMove: function(x, y, maxX, maxY) {
     if(this.pos && (this.pos[0] !== x || this.pos[1] !== y)) {
       this.lines[this.selectedObjectIndex].move(x, y, maxX, maxY);
-      this.render();
+      this.pendingRender = 10;
       this.pos = [ x, y ];
     }
   },
@@ -217,15 +222,18 @@ const app = {
       this.lines[this.selectedObjectIndex].resetCursor();
       this.lines[this.selectedObjectIndex].unselect();
       this.selectedObjectIndex = -1;
-      this.render();
+      this.pendingRender = 10;
       this.pos = null;
     }
   },
   
   render: function() {
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    this.lines.forEach((line) => line.draw(ctx));
+    if(this.pendingRender > 0) {
+      this.pendingRender--;
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      this.lines.forEach((line) => line.draw(ctx));
+    }
   },
 };
