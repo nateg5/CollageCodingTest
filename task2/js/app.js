@@ -85,7 +85,7 @@ const app = {
       const x = e.offsetX;
       const y = e.offsetY;
       if(this.mode === MODE.PENCIL) {
-        this.pencilBegin(x, y);
+        this.pencilBegin(x, y, canvas.width, canvas.height);
       } else if(this.mode === MODE.MOVE) {
         this.moveBegin(x, y);
       }
@@ -101,12 +101,12 @@ const app = {
     });
     canvas.addEventListener('mouseup', (e) => {
       if(this.mode === MODE.PENCIL) {
-        this.pencilEnd();
+        this.pencilEnd(canvas.width, canvas.height);
       }
     });
     canvas.addEventListener('mouseout', (e) => {
       if(this.mode === MODE.PENCIL) {
-        this.pencilEnd();
+        this.pencilEnd(canvas.width, canvas.height);
       }
     });
     /**
@@ -165,11 +165,11 @@ const app = {
     }
   },
 
-  pencilBegin: function(x, y) {
+  pencilBegin: function(x, y, maxX, maxY) {
     // save pencil start position
     this.pos = [ x, y ];
     // create the pencil and add to the list
-    this.pencil = new Pencil();
+    this.pencil = new Pencil(maxX, maxY, 0, 0);
     this.lines.push(this.pencil);
   },
 
@@ -184,14 +184,18 @@ const app = {
     }
   },
 
-  pencilEnd: function() {
+  pencilEnd: function(maxX, maxY) {
     /**
      * if pencil is empty then remove from list
      * this can happen if the mousedown and mouseup event happen at the same coordinates
      */
-    if(this.pencil && this.pencil.isEmpty()) {
-      this.lines.splice(-1, 1);
-      this.pendingRender = 10;
+    if(this.pencil) {
+      if(this.pencil.isEmpty()) {
+        this.lines.splice(-1, 1);
+        this.pendingRender = 10;
+      } else {
+        this.pencil.calculateBounds(maxX, maxY, 0, 0);
+      }
     }
     this.pencil = null;
     this.pos = null;

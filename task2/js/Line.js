@@ -17,10 +17,6 @@ Line.prototype.resetCursor = function() {
   this.cursor = null;
 }
 
-Line.prototype.getCursor = function() {
-  return this.cursor;
-}
-
 Line.prototype.draw = function(ctx) {
   ctx.strokeStyle = '#000';
   ctx.lineWidth = 1;
@@ -55,14 +51,18 @@ Line.prototype.moveX = function(dx, maxX) {
   dx = this.adjustdx(dx, maxX);
   this.x1 += dx;
   this.x2 += dx;
-  this.cursor.x += dx;
+  if(this.cursor) {
+    this.cursor.x += dx;
+  }
 };
 
 Line.prototype.moveY = function(dy, maxY) {
   dy = this.adjustdy(dy, maxY);
   this.y1 += dy;
   this.y2 += dy;
-  this.cursor.y += dy;
+  if(this.cursor) {
+    this.cursor.y += dy;
+  }
 };
 
 Line.prototype.adjustdx = function(dx, maxX) {
@@ -97,3 +97,12 @@ Line.prototype.squareDistanceFrom = function(x, y) {
   const { x1, y1, x2, y2 } = this;
   return Geometry.squareDistanceToSegment(x, y, x1, y1, x2, y2);
 };
+
+Line.prototype.getBounds = function() {
+  return {
+    x1: this.x1 < this.x2 ? this.x1 : this.x2,
+    y1: this.y1 < this.y2 ? this.y1 : this.y2,
+    x2: this.x1 < this.x2 ? this.x2 : this.x1,
+    y2: this.y1 < this.y2 ? this.y2 : this.y1
+  };
+}
