@@ -1,6 +1,5 @@
 const Pencil = function() {
   this.lines = [];
-  this.selected = false;
 };
 
 Pencil.prototype.setCursor = function(x, y) {
@@ -27,9 +26,6 @@ Pencil.prototype.draw = function(ctx) {
   this.lines.forEach((line, index) => {
     line.draw(ctx);
   });
-  if(this.selected) {
-    this.drawEnds(ctx);
-  }
 };
 
 Pencil.prototype.drawEnds = function(ctx) {
@@ -78,15 +74,3 @@ Pencil.prototype.squareDistanceFrom = function(x, y) {
   });
   return minSquareDistance;
 };
-
-Pencil.prototype.select = function() {
-  this.selected = true;
-};
-
-Pencil.prototype.unselect = function() {
-  this.selected = false;
-};
-
-Pencil.prototype.isSelected = function() {
-  return this.selected;
-}

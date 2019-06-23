@@ -3,7 +3,6 @@ const Line = function(x1, y1, x2, y2) {
   this.y1 = y1;
   this.x2 = x2;
   this.y2 = y2;
-  this.selected = false;
   this.cursor = null;
 };
 
@@ -29,9 +28,6 @@ Line.prototype.draw = function(ctx) {
   ctx.moveTo(this.x1, this.y1);
   ctx.lineTo(this.x2, this.y2);
   ctx.stroke();
-  if(this.selected) {
-    this.drawEnds(ctx);
-  }
 };
 
 Line.prototype.drawEnds = function(ctx) {
@@ -101,15 +97,3 @@ Line.prototype.squareDistanceFrom = function(x, y) {
   const { x1, y1, x2, y2 } = this;
   return Geometry.squareDistanceToSegment(x, y, x1, y1, x2, y2);
 };
-
-Line.prototype.select = function() {
-  this.selected = true;
-};
-
-Line.prototype.unselect = function() {
-  this.selected = false;
-};
-
-Line.prototype.isSelected = function() {
-  return this.selected;
-}
